@@ -10,13 +10,13 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email == "serdarerman@gmail.com"; 
     }
 
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
     match /artifacts/{appId}/public/data/flashcards/main-deck {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /artifacts/{document=**} {
+      allow read: if true;
     }
   }
 }

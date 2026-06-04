@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Settings, LogOut, Download, Upload, Info } from 'lucide-react';
+import { Settings, LogOut, Download, Upload, Info, Scale, Droplets, Globe, Leaf, Lightbulb } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { baseFlashcards, Flashcard } from './data';
 import { 
@@ -14,6 +14,26 @@ import {
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 const ADMIN_EMAIL = "serdarerman@gmail.com";
+
+const getCategoryIcon = (category?: string) => {
+  switch (category) {
+    case "Uluslararası Hukuk": return <Scale size={48} className="text-blue-200 mb-4 opacity-50" />;
+    case "Havza Yönetimi": return <Droplets size={48} className="text-blue-200 mb-4 opacity-50" />;
+    case "Su Diplomasisi": return <Globe size={48} className="text-blue-200 mb-4 opacity-50" />;
+    case "Çevresel Etkiler": return <Leaf size={48} className="text-blue-200 mb-4 opacity-50" />;
+    default: return <Lightbulb size={48} className="text-blue-200 mb-4 opacity-50" />;
+  }
+};
+
+const getCategoryIconBack = (category?: string) => {
+  switch (category) {
+    case "Uluslararası Hukuk": return <Scale size={48} className="text-slate-600 mb-4 opacity-50" />;
+    case "Havza Yönetimi": return <Droplets size={48} className="text-slate-600 mb-4 opacity-50" />;
+    case "Su Diplomasisi": return <Globe size={48} className="text-slate-600 mb-4 opacity-50" />;
+    case "Çevresel Etkiler": return <Leaf size={48} className="text-slate-600 mb-4 opacity-50" />;
+    default: return <Lightbulb size={48} className="text-slate-600 mb-4 opacity-50" />;
+  }
+};
 
 interface RssItem {
   title: string;
@@ -58,6 +78,7 @@ export default function App() {
       setCurrentUser(user);
     });
 
+    console.log("Firestore Path:", 'artifacts', appId, 'public', 'data', 'flashcards', 'main-deck');
     const deckRef = doc(db, 'artifacts', appId, 'public', 'data', 'flashcards', 'main-deck');
     const unsubStore = onSnapshot(deckRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -527,8 +548,9 @@ export default function App() {
             )}
             {currentCard ? (
               <div className="flex flex-col h-full w-full justify-between items-center">
-                <div className="mt-8 flex-1 flex items-center justify-center">
-                  <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium text-slate-700">
+                <div className="mt-8 flex-1 flex flex-col items-center justify-center">
+                  {getCategoryIcon(currentCard.kategori)}
+                  <div className="text-lg md:text-xl leading-relaxed mt-2 mb-4 font-medium text-slate-700">
                     {currentCard.soru}
                   </div>
                 </div>
@@ -562,8 +584,9 @@ export default function App() {
             )}
             {currentCard ? (
               <div className="flex flex-col h-full w-full justify-between items-center">
-                <div className="mt-8 flex-1 flex items-center justify-center">
-                  <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium">
+                <div className="mt-8 flex-1 flex flex-col items-center justify-center">
+                  {getCategoryIconBack(currentCard.kategori)}
+                  <div className="text-lg md:text-xl leading-relaxed mt-2 mb-4 font-medium">
                     {currentCard.cevap}
                   </div>
                 </div>
