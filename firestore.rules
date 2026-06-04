@@ -15,7 +15,7 @@ service cloud.firestore {
     }
 
     match /artifacts/{appId}/public/data/flashcards/main-deck {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow write: if isAdmin();
     }
   }

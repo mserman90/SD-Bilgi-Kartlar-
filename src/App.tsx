@@ -3,7 +3,6 @@ import { Settings, LogOut, Download, Upload } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { baseFlashcards, Flashcard } from './data';
 import { 
-  signInAnonymously, 
   onAuthStateChanged, 
   GoogleAuthProvider, 
   signInWithPopup, 
@@ -54,36 +53,28 @@ export default function App() {
   };
 
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        await signInAnonymously(auth);
-      } catch (err) {
-        console.error("Auth init error:", err);
-      }
-    };
-    initAuth();
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      if (user) {
-        const deckRef = doc(db, 'artifacts', appId, 'public', 'data', 'flashcards', 'main-deck');
-        const unsubStore = onSnapshot(deckRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data.cards && data.cards.length > 0) {
-              setMasterFlashcards(data.cards);
-            }
-          } else {
-            setMasterFlashcards([...baseFlashcards]);
-          }
-        }, (err) => {
-          console.error("Firestore read error:", err);
-        });
-        return () => unsubStore();
+    });
+
+    const deckRef = doc(db, 'artifacts', appId, 'public', 'data', 'flashcards', 'main-deck');
+    const unsubStore = onSnapshot(deckRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.cards && data.cards.length > 0) {
+          setMasterFlashcards(data.cards);
+        }
+      } else {
+        setMasterFlashcards([...baseFlashcards]);
       }
+    }, (err) => {
+      console.error("Firestore read error:", err);
     });
     
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      unsubStore();
+    };
   }, []);
 
   useEffect(() => {
@@ -231,7 +222,6 @@ export default function App() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await signInAnonymously(auth);
       closeModals();
       showNotification("Çıkış yapıldı.");
     } catch (e) {
