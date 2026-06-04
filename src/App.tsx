@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Settings, LogOut, Download, Upload } from 'lucide-react';
+import { Settings, LogOut, Download, Upload, Info } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { baseFlashcards, Flashcard } from './data';
 import { 
@@ -33,6 +33,7 @@ export default function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showUnauthorizedModal, setShowUnauthorizedModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -181,6 +182,7 @@ export default function App() {
     setShowAdminModal(false);
     setShowUnauthorizedModal(false);
     setShowLoginModal(false);
+    setShowInfoModal(false);
   };
 
   const handleGoogleLogin = async () => {
@@ -338,8 +340,15 @@ export default function App() {
         <Settings size={16} /> Yönetim Paneli
       </button>
 
+      <button 
+        onClick={() => setShowInfoModal(true)}
+        className="absolute top-5 right-5 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 text-sm rounded-md z-40 transition-colors flex items-center gap-2 shadow-sm"
+      >
+        <Info size={16} /> Hakkında
+      </button>
+
       {/* Modals Overlay */}
-      {(showLoginModal || showAdminModal || showUnauthorizedModal) && (
+      {(showLoginModal || showAdminModal || showUnauthorizedModal || showInfoModal) && (
         <div className="fixed inset-0 bg-black/50 z-[2000]" onClick={closeModals} />
       )}
 
@@ -427,6 +436,44 @@ export default function App() {
         </div>
       )}
 
+      {/* Info Modal */}
+      {showInfoModal && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-md max-h-[85vh] overflow-y-auto border border-slate-100">
+          <div className="flex items-center gap-3 mb-6 border-b pb-4">
+            <div className="p-2 bg-blue-100 rounded-lg text-blue-600 shadow-sm">
+              <Info size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Uygulama Hakkında</h2>
+          </div>
+          
+          <div className="space-y-6 text-sm text-slate-700 leading-relaxed text-left">
+            <div>
+              <h3 className="font-semibold text-slate-900 text-base mb-2">Amacımız</h3>
+              <p>
+                Bu uygulama, "Su Diplomasisi" (Water Diplomacy) alanındaki kavram, antlaşma ve terimlerin hızlı ve etkileşimli bir şekilde öğrenilmesini sağlamak amacıyla geliştirilmiştir. Öğrenciler, araştırmacılar ve ilgili personel için yapılandırılmış bir pratik çalışma aracıdır.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-slate-900 text-base mb-2">Özellikler</h3>
+              <ul className="list-disc pl-5 space-y-2 text-slate-600">
+                <li><strong className="text-slate-800">İnteraktif Bilgi Kartları:</strong> Soru-cevap şeklindeki kartlarla kendinizi test edin.</li>
+                <li><strong className="text-slate-800">Kategorik Çalışma:</strong> "Uluslararası Hukuk", "Havza Yönetimi", "Su Diplomasisi" ve "Çevresel Etkiler" gibi belirli kategorileri filtreleyerek çalışın.</li>
+                <li><strong className="text-slate-800">İsteğe Bağlı Soru Sayısı:</strong> Çözmek istediğiniz soru adedini belirleyin (10, 25, 50, Tümü) ve kalanları rastgele filtreleyin.</li>
+                <li><strong className="text-slate-800">Çevrimdışı Kullanım (PWA - Progressive Web App):</strong> Uygulama tarayıcınız aracılığıyla cihazınıza yüklenebilir ve bir kere önyüklendikten sonra veri israfı olmadan veya internet bağlantınız kesilse dahi çevrimdışı kullanılabilir.</li>
+                <li><strong className="text-slate-800">Bulut Destekli İçerik:</strong> Admin paneli yardımı ile yöneticiler doğrudan veri ekleyebilir ve uygulama veritabanını güncelleyebilir.</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-4 border-t border-slate-100">
+            <button onClick={closeModals} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors cursor-pointer shadow-sm">
+              Okudum, Kapat
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mt-14 md:mt-6 text-center z-10 w-full max-w-3xl px-4">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Su Diplomasisi Bilgi Kartları</h1>
         <p className="text-sm md:text-base text-slate-500 mb-8 max-w-lg mx-auto">Kurumsal Çerçeve ve Küresel Havza Analizleri (Genişletilmiş Veri Seti)</p>
@@ -479,16 +526,29 @@ export default function App() {
                 <div className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-600 px-2.5 py-1 rounded-full">{currentCard.kategori}</div>
             )}
             {currentCard ? (
-              <>
-                <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium text-slate-700">
-                  {currentCard.soru}
-                </div>
-                {currentCard.soru_atif && (
-                  <div className="text-xs italic text-slate-400 mt-4 pt-4 border-t border-slate-100 w-full break-words">
-                    Kaynak: {currentCard.soru_atif}
+              <div className="flex flex-col h-full w-full justify-between items-center">
+                <div className="mt-8 flex-1 flex items-center justify-center">
+                  <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium text-slate-700">
+                    {currentCard.soru}
                   </div>
-                )}
-              </>
+                </div>
+                <div className="mt-auto w-full flex flex-col items-center">
+                  <button className="bg-blue-50 text-blue-600 px-5 py-2.5 rounded-full text-sm font-semibold mb-3 hover:bg-blue-100 transition-colors">
+                    Yanıtı görüntüleyin
+                  </button>
+                  {currentCard.soru_atif && (
+                    <a 
+                      href={`https://www.google.com/search?q=${encodeURIComponent(currentCard.soru_atif)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs italic text-slate-400 mt-2 pt-4 border-t border-slate-100 w-full break-words block hover:text-blue-500 transition-colors z-20"
+                    >
+                      Kaynak: {currentCard.soru_atif}
+                    </a>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="text-red-500 font-bold">Veri mevcut değil</div>
             )}
@@ -501,16 +561,26 @@ export default function App() {
                 <div className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full">{currentCard.kategori}</div>
             )}
             {currentCard ? (
-              <>
-                <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium">
-                  {currentCard.cevap}
+              <div className="flex flex-col h-full w-full justify-between items-center">
+                <div className="mt-8 flex-1 flex items-center justify-center">
+                  <div className="text-lg md:text-xl leading-relaxed mt-6 mb-4 font-medium">
+                    {currentCard.cevap}
+                  </div>
                 </div>
                 {currentCard.cevap_atif && (
-                  <div className="text-xs italic text-slate-300 mt-4 pt-4 border-t border-slate-600 w-full break-words opacity-80">
-                    Kaynak: {currentCard.cevap_atif}
+                  <div className="mt-auto w-full flex flex-col items-center">
+                    <a 
+                      href={`https://www.google.com/search?q=${encodeURIComponent(currentCard.cevap_atif)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs italic text-slate-300 mt-4 pt-4 border-t border-slate-600 w-full break-words opacity-80 block hover:text-blue-300 transition-colors z-20"
+                    >
+                      Kaynak: {currentCard.cevap_atif}
+                    </a>
                   </div>
                 )}
-              </>
+              </div>
             ) : (
               <div className="text-red-400 font-bold">Veri mevcut değil</div>
             )}
