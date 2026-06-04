@@ -479,7 +479,7 @@ export default function App() {
       </div>
 
       {/* Card Arena */}
-      <div className="card-container w-full max-w-[700px] h-[440px] mb-8 cursor-pointer z-10" onClick={() => setIsFlipped(!isFlipped)}>
+      <div className="card-container w-full max-w-[700px] h-[380px] sm:h-[440px] mb-8 cursor-pointer z-10" onClick={() => setIsFlipped(!isFlipped)}>
         <div className={`flash-card w-full h-full relative rounded-2xl shadow-lg border border-slate-100 ${isFlipped ? 'flipped' : ''}`}>
           
           {/* Front */}
