@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "Deck": {
+      "title": "Deck",
+      "description": "The main flashcards deck.",
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "array"
+        }
+      },
+      "required": ["cards"]
+    }
+  },
+  "firestore": {
+    "/artifacts/{appId}/public/data/flashcards/main-deck": {
+      "schema": {
+        "$ref": "Deck"
+      },
+      "description": "Stores the flashcard deck"
+    }
+  }
+}
