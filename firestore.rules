@@ -9,10 +9,25 @@ service cloud.firestore {
     function isAdmin() { 
       return isSignedIn() && request.auth.token.email == "serdarerman@gmail.com"; 
     }
+    
+    function isValidFeedback(data) {
+      return data.keys().hasAll(['message', 'type', 'createdAt']) &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 2000 &&
+             data.type is string && data.type in ['görüş', 'hata'] &&
+             data.createdAt == request.time &&
+             (data.keys().hasAll(['userEmail']) ? (data.userEmail is string || data.userEmail == null) : true) &&
+             (data.keys().hasAll(['userId']) ? (data.userId is string || data.userId == null) : true) &&
+             data.keys().size() <= 5;
+    }
 
     match /artifacts/{appId}/public/data/flashcards/main-deck {
       allow read: if true;
       allow write: if isAdmin();
+    }
+    
+    match /artifacts/{appId}/feedback/{feedbackId} {
+      allow create: if isValidFeedback(incoming());
+      allow read, update, delete: if isAdmin();
     }
 
     match /artifacts/{document=**} {
