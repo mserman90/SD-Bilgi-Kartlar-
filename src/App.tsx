@@ -222,6 +222,51 @@ export default function App() {
     setIsFlipped(false);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Do not trigger if user is typing in an input or textarea
+      if (
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA' ||
+        document.activeElement?.tagName === 'SELECT'
+      ) {
+        return;
+      }
+      
+      // Do not trigger if any modal is open or if we are on the hero screen
+      if (
+        showHero ||
+        showLoginModal ||
+        showAdminModal ||
+        showUserModal ||
+        showUnauthorizedModal ||
+        showInfoModal ||
+        showFeedbackModal ||
+        showHintModal
+      ) {
+        return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextCard();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevCard();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        setIsFlipped(f => !f);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    showHero, showLoginModal, showAdminModal, showUserModal, 
+    showUnauthorizedModal, showInfoModal, showFeedbackModal, showHintModal,
+    activeFlashcards.length, isFlipped
+  ]);
+
   const nextCard = () => {
     if (activeFlashcards.length === 0) return;
     if (isFlipped) {
@@ -657,29 +702,25 @@ export default function App() {
           
           <div className="space-y-6 text-sm text-slate-700 dark:text-slate-300 leading-relaxed text-left">
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">Amacımız</h3>
-              <p>
-                Bu uygulama, "Su Diplomasisi" (Water Diplomacy) alanındaki kavram, antlaşma ve terimlerin hızlı ve etkileşimli bir şekilde öğrenilmesini sağlamak amacıyla geliştirilmiştir. Öğrenciler, araştırmacılar ve ilgili personel için yapılandırılmış bir pratik çalışma aracıdır.
-              </p>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">{texts.aboutAimTitle}</h3>
+              <p>{texts.aboutAimDesc}</p>
             </div>
             
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">Özellikler</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">{texts.aboutFeaturesTitle}</h3>
               <ul className="list-disc pl-5 space-y-2 text-slate-600 dark:text-slate-400">
-                <li><strong className="text-slate-800 dark:text-slate-200">İnteraktif Bilgi Kartları:</strong> Soru-cevap şeklindeki kartlarla kendinizi test edin.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">Kategorik Çalışma:</strong> "Uluslararası Hukuk", "Havza Yönetimi", "Su Diplomasisi" ve "Çevresel Etkiler" gibi belirli kategorileri filtreleyerek çalışın.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">İsteğe Bağlı Soru Sayısı:</strong> Çözmek istediğiniz soru adedini belirleyin (10, 25, 50, Tümü) ve kalanları rastgele filtreleyin.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">Çevrimdışı Kullanım (PWA - Progressive Web App):</strong> Uygulama tarayıcınız aracılığıyla cihazınıza yüklenebilir ve bir kere önyüklendikten sonra veri israfı olmadan veya internet bağlantınız kesilse dahi çevrimdışı kullanılabilir.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">Bulut Destekli İçerik:</strong> Admin paneli yardımı ile yöneticiler doğrudan veri ekleyebilir ve uygulama veritabanını güncelleyebilir.</li>
+                {(texts.aboutFeaturesList as Array<{t: string, d: string}>).map((item, i) => (
+                  <li key={i}><strong className="text-slate-800 dark:text-slate-200">{item.t}</strong> {item.d}</li>
+                ))}
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">Kullanıcı Girişinin Avantajları</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base mb-2">{texts.aboutAuthTitle}</h3>
               <ul className="list-disc pl-5 space-y-2 text-slate-600 dark:text-slate-400">
-                <li><strong className="text-slate-800 dark:text-slate-200">Kişiselleştirilmiş İlerleme:</strong> Hangi kartları öğrenip hangilerini tekrar edeceğinizi hesabınıza kaydedin.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">Bulut Senkronizasyonu:</strong> Farklı cihazlardan giriş yapsanız dahi ilerlemeniz kaybolmaz ve her yerden aynı yerden devam edebilirsiniz.</li>
-                <li><strong className="text-slate-800 dark:text-slate-200">Gelişim Takibi:</strong> Kendi performansınızı ölçerek öğrenme rotanızı belirleyin.</li>
+                {(texts.aboutAuthList as Array<{t: string, d: string}>).map((item, i) => (
+                  <li key={i}><strong className="text-slate-800 dark:text-slate-200">{item.t}</strong> {item.d}</li>
+                ))}
               </ul>
             </div>
           </div>

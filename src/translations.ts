@@ -61,6 +61,22 @@ export const t = {
     badgeAnalyst: 'Havza Analisti',
     badgeResearcher: 'Araştırmacı',
     badgeApprentice: 'Çırak',
+    
+    aboutAimTitle: "Amacımız",
+    aboutAimDesc: "Bu uygulama, 'Su Diplomasisi' (Water Diplomacy) alanındaki kavram, antlaşma ve terimlerin hızlı ve etkileşimli bir şekilde öğrenilmesini sağlamak amacıyla geliştirilmiştir. Öğrenciler, araştırmacılar ve alan profesyonelleri için yapılandırılmış bir pratik çalışma aracıdır.",
+    aboutFeaturesTitle: "Özellikler",
+    aboutFeaturesList: [
+      { t: "İnteraktif Bilgi Kartları:", d: "Su diplomasisine dair 110+ soru-cevap kartıyla kendinizi test edin." },
+      { t: "Kategorik Çalışma:", d: "'Uluslararası Hukuk', 'Havza Yönetimi', 'Su Diplomasisi' ve 'Çevresel Etkiler' gibi kategorilerde özel olarak çalışın." },
+      { t: "Çoklu Dil ve Tema Desteği:", d: "İngilizce/Türkçe dil seçenekleri ve Aydınlık/Karanlık görsel temalar ile arayüzü özelleştirin." },
+      { t: "Çevrimdışı Kullanım (PWA):", d: "Uygulamayı tarayıcınız aracılığıyla cihazınıza yükleyerek internet bağlantısı olmadan da kesintisiz çalışın." },
+      { t: "Geri Bildirim Sistemi:", d: "Hatalı kartları bildirme veya yeni fikirler sunma özelliği." }
+    ],
+    aboutAuthTitle: "Kullanıcı Deneyimi Avantajları",
+    aboutAuthList: [
+      { t: "Gelişim Takibi & Rozetler:", d: "Öğrendiğiniz kartları kaydederek sıralama rütbeleri (Çırak, Araştırmacı, Analist, Uzman) kazanın." },
+      { t: "Bulut Senkronizasyonu:", d: "Firebase altyapısı sayesinde ilerlemenizi bulutta güvenle saklayıp farklı cihazlardan kaldığınız yerden devam edin." }
+    ]
   },
   en: {
     appTitle: "Water Diplomacy",
@@ -122,5 +138,21 @@ export const t = {
     badgeAnalyst: 'Basin Analyst',
     badgeResearcher: 'Researcher',
     badgeApprentice: 'Apprentice',
+    
+    aboutAimTitle: "Our Aim",
+    aboutAimDesc: "This application is developed to enable fast and interactive learning of concepts, treaties, and terms in the field of 'Water Diplomacy'. It serves as a structured practice tool for students, researchers, and field professionals.",
+    aboutFeaturesTitle: "Features",
+    aboutFeaturesList: [
+      { t: "Interactive Flashcards:", d: "Test yourself with 110+ question-answer cards on water diplomacy." },
+      { t: "Categorical Study:", d: "Focus on specific categories such as 'International Law', 'Basin Management', 'Water Diplomacy', and 'Environmental Impacts'." },
+      { t: "Multi-language & Theme Support:", d: "Study using English/Turkish languages and Dark/Light visual themes." },
+      { t: "Offline Usage (PWA):", d: "Install the app on your device and work seamlessly without an internet connection." },
+      { t: "Feedback System:", d: "Report flawed cards or suggest new ideas easily." }
+    ],
+    aboutAuthTitle: "User Experience Advantages",
+    aboutAuthList: [
+      { t: "Progress Tracking & Badges:", d: "Save the cards you have learned and earn ranking badges (Apprentice, Researcher, Analyst, Expert)." },
+      { t: "Cloud Synchronization:", d: "Safely store your progress in the cloud with Firebase integration and continue where you left off from any device." }
+    ]
   }
 };
