@@ -669,6 +669,96 @@ export const baseFlashcards: Flashcard[] = [
         soru_atif: "Schmeier, S. (2018). The Role of River Basin Organizations in Conflict Prevention.",
         cevap: "Suya bağlı gerilim ve krizler akut güvenlik sorunlarına (şiddete) dönüşmeden önce kurumsal işbirliği, veri paylaşımı ve erken uyarı sistemleri ile sorunların barışçıl diplomasi kanallarıyla sınırlandırılmasıdır.",
         cevap_atif: "Schmeier, S. (2018). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "İklim rejiminde 'Kayıp ve Zarar' (Loss and Damage) mekanizması hidropolitik bağlamında nasıl tartışılır?",
+        soru_atif: "UNFCCC (2013). Warsaw International Mechanism for Loss and Damage.",
+        cevap: "Özellikle kuraklık veya sel gibi iklim kaynaklı su aşırılıklarının yol açtığı ve uyum kapasitesinin ötesindeki geri döndürülemez zararların uluslararası boyutta nasıl telafi edileceği veya kimin sorumlu tutulacağı tartışmasını beraberinde getirir.",
+        cevap_atif: "UNFCCC raporları. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Parçalanmış su yönetimi (Fragmented Water Management) sınır aşan havzalarda neden diplomatik kriz riskini artırır?",
+        soru_atif: "Global Water Partnership (GWP) Technical Committee.",
+        cevap: "Aynı havzadaki farklı sektörlerin (enerji, tarım, çevre) veya yerel otoritelerin birbirinden bağımsız, bazen de zıt hedeflerle hareket etmesi; suyu bölüşme konusunda ulusal ve bölgesel ölçekte tutarsız, tahripkar rekabete yol açtığı için.",
+        cevap_atif: "GWP (2000). Integrated Water Resources Management. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su ayak izi (Water Footprint) kavramının uluslararası su müzakerelerinde 'Sanal Su Ticareti' ile birlikte önemi nedir?",
+        soru_atif: "Hoekstra, A. Y., & Chapagain, A. K. (2008). Globalization of Water.",
+        cevap: "Ülkelerin su tüketiminin sadece fiziksel sınırları içerisindeki suyla kalmadığını, ithal ettikleri tarımsal ve endüstriyel ürünlerin üretimi için başka coğrafyaların sularını da kullandıklarını sayısal bir çerçeve ile ortaya koyarak adil maliyetlendirme yapılmasını sağlar.",
+        cevap_atif: "Hoekstra & Chapagain (2008). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Hidro-hegemonya teorisinde (Hydro-Hegemony Theory) 'yumuşak güç' (soft power) su güç dengesini nasıl etkiler?",
+        soru_atif: "Zeitoun, M., & Warner, J. (2006). Hydro-hegemony: A framework for analysis of trans-boundary water conflicts.",
+        cevap: "Fiziksel ve askeri güç (hard power) kullanılmadan; bilgi tekelini elinde tutma, anlaşma metinlerini kendi çıkarlarına uygun çerçeveleme ve uluslararası finansmanı (Dünya Bankası vb.) diplomatik rıza yoluyla kendi lehinde kullanma imkânı tanıyarak gücü pekiştirir.",
+        cevap_atif: "Zeitoun & Warner (2006). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Nehir havzası organizasyonlarının (RBO) sınır aşan havzalarda asimetrik güç ilişkilerini dengelemedeki rolü nedir?",
+        soru_atif: "Schmeier, S. (2012). Governing International Watercourses.",
+        cevap: "Tüm kıyıdaşlara kurallara dayalı, şeffaf, oybirliği veya kurumsallaşmış mekanizmalar doğrultusunda karar alma garantisi sunarak, suların sadece en güçlü kıyıdaş (hegemon) tarafından keyfi olarak yönetilmesini sınırlar.",
+        cevap_atif: "Schmeier, S. (2012). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Kıyıdaş (Riparian) devletlerin ortak baraj veya altyapı projeleri geliştirmesi diplomasi bağlamında hangi oyun teorisi yaklaşımına en iyi örnektir?",
+        soru_atif: "Dinar, A., et al. (2007). Bridges over Water.",
+        cevap: "Her bir devletin tek başına yatırım yapmak yerine kaynaklarını birleştirerek maliyeti düşürdüğü ve hidroelektrik, sulama veya taşkın kontrolü gibi faydaları maksimize edip paylaştığı 'Pozitif Toplamlı Oyun' (Positive-Sum Game) / 'Kazan-Kazan' stratejisine örnektir.",
+        cevap_atif: "Dinar, A. et al. (2007). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Ekolojik Akış (Environmental Flow) gereksinimlerinin sınır aşan su anlaşmalarında giderek daha fazla yer bulmasının temel diplomatik sebebi nedir?",
+        soru_atif: "Brisbane Declaration (2007) / IUCN.",
+        cevap: "Antropojenik (insan kaynaklı) su talebini karşılarken, ekosistem sağlığının korunmasının nehrin kendi kendini temizleme kapasitesi ve hidro-güvenliğin uzun vadedeki sürdürülebilirliği için taviz verilemez bir asgari şart olduğunun kabul edilmesidir.",
+        cevap_atif: "Brisbane Declaration on Environmental Flows. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "1992 Dublin İlkeleri'nde yer alan 'Suyun ekonomik bir değeri vardır' maddesi uluslararası su diplomasisinde hangi argümana zemin hazırlamıştır?",
+        soru_atif: "ICWE (1992). The Dublin Statement on Water and Sustainable Development.",
+        cevap: "Suyun bedava ve sonsuz bir doğal haktan ziyade yatırım, işletme ve bertaraf maliyeti olan kıt bir meta (economic good) olarak tanımlanmasına; dolayısıyla adil fiyatlandırma, özelleştirme ve su pazarlarının oluşmasına zemin hazırlamıştır.",
+        cevap_atif: "ICWE, Dublin Statement. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Sınır aşan yeraltı suları (Akviferler) diplomasi arenasında neden yüzey sularına (nehir/göl) kıyasla daha zor yönetilebilir kabul edilir?",
+        soru_atif: "Puri, S., & Aureli, A. (2005). Transboundary Aquifers: A global overview.",
+        cevap: "Yeraltı sistemlerinin hidrodinamik sınırlarının gözlemlenememesi, beslenme (recharge) oranlarındaki bilimsel belirsizliklerin yüksek olması ve ülkelerin 'aşırı çekim (over-pumping)' verilerini gizlemeye daha yatkın olmalarından kaynaklanır.",
+        cevap_atif: "Puri & Aureli (2005). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Avrupa Birliği Su Çerçeve Direktifi'nin (WFD) sınır aşan kıta içi su diplomasisine getirdiği en yapısal (kurumsal) yenilik nedir?",
+        soru_atif: "European Union. (2000). Water Framework Directive (2000/60/EC).",
+        cevap: "Su yönetimini ulusal ve siyasi idari sınırlarla değil, doğal hidrolojik sınırları esas alan 'Nehir Havzası Yönetim Planları (RBMP)' aracılığıyla bütünleşik, hukuki bir zorunluluk haline getirmesidir.",
+        cevap_atif: "EU WFD (2000/60/EC). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Uluslararası Adalet Divanı'nın (ICJ) 1997 tarihli Gabčíkovo-Nagymaros Projesi (Macaristan-Slovakya) kararının su diplomasisi tarihindeki önemini belirleyen ilke nedir?",
+        soru_atif: "ICJ. (1997). Case Concerning the Gabčíkovo-Nagymaros Project.",
+        cevap: "Uluslararası bir mahkemenin, ikili ekonomik kalkınma baraj projelerin iptal ve tazminatında ilk defa 'Ekolojik Zorunluluk' kavramını ve 'Sürdürülebilir Kalkınma' ilkesini bağlayıcı bir uluslararası hukuk normu olarak kabul etmesidir.",
+        cevap_atif: "ICJ Judgments. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "'Mavi Diplomasi' (Blue Diplomacy) kavramı standart su diplomasisi şemsiyesinde spesifik olarak ağırlıklı olarak hangi ekosisteme odaklanır?",
+        soru_atif: "Tscherning, H., et al. (Oceans and Geopolitics).",
+        cevap: "Ağırlıklı olarak deniz, okyanus kaynakları, münhasır ekonomik bölgeler, deniz kirliliği ve derin deniz madenciliği (Mavi Ekonomi) gibi okyanus yönetişimi etrafındaki stratejik ve uluslararası hukuksal süreçlere odaklanır.",
+        cevap_atif: "Literature on Blue Economy/Diplomacy. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "İklim değişikliğinin tetiklediği 'Su Göçü' (Water-induced Migration) kavramı 'çok taraflı' (multilateral) diplomasi ajandasında neden her geçen gün daha sık yer bulmaktadır?",
+        soru_atif: "IOM (2014). IOM Outlook on Migration, Environment and Climate Change.",
+        cevap: "Su kıtlığı ve tarımsal çöküş sebebiyle yerinden edilen kitlelerin, ulusal sınırları aşarak transit veya hedef coğrafyalarda yarattıkları asimetrik sosyo-ekonomik ve güvenlik baskılarının, ülkelerin tek başına çözemeyeceği küresel bir kriz doğurması nedeniyledir.",
+        cevap_atif: "IOM (2014). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Hidro-diplomaside kullanılan 'Çok Yönlü Yaklaşım' (Multi-track Diplomacy) sivil toplum aktörlerini sürece dahil etmesinde neden etkilidir?",
+        soru_atif: "Diamond, L., & McDonald, J. W. (1996). Multi-Track Diplomacy.",
+        cevap: "Sadece devlet bürokrasisinin (Track 1) yürüttüğü resmi katı pazarlıkları esneterek; üniversiteleri, dini grupları, iş dünyasını ve sivil inisiyatifleri de (Track 2 ve 3) diyalog sürecine katarak sosyal kabulü ve karşılıklı empati potansiyelini yükseltir.",
+        cevap_atif: "Diamond & McDonald (1996). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Transboundary Waters Assessment Programme (TWAP) çerçevesinin sınır aşan su sistemlerinin izlenmesindeki birincil amacı nedir?",
+        soru_atif: "GEF/UNEP (2016). Transboundary Waters Assessment Programme.",
+        cevap: "Gezegen yüzeyindeki paylaşılmış tüm nehir havzası, göl, kıyı şeridi ve yeraltı su sistemlerinin çevresel, sosyo-ekonomik ve yönetişimsel kırılganlık derecelerini periyodik ve bilimsel bir gösterge (indeks) tabanında sınıflandırarak ortak uluslararası karar mekanizmalarını veriyle desteklemektir.",
+        cevap_atif: "GEF/UNEP (2016). Alındığı tarih: 5 Haziran 2026."
     }
 ];
 

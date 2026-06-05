@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Settings, LogOut, Download, Upload, Info, Scale, Droplets, Globe, Leaf, Lightbulb, Moon, Sun, User as UserIcon, LogIn, UserPlus, X, ChevronLeft, ChevronRight, Check, RefreshCw, RotateCcw, MessageSquare, AlertTriangle, Award, Share2, HelpCircle } from 'lucide-react';
+import { Search, Settings, LogOut, Download, Upload, Info, Scale, Droplets, Globe, Leaf, Lightbulb, Moon, Sun, User as UserIcon, LogIn, UserPlus, X, ChevronLeft, ChevronRight, Check, RefreshCw, RotateCcw, MessageSquare, AlertTriangle, Award, Share2, HelpCircle } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { baseFlashcards, Flashcard } from './data';
 import { t, Lang } from './translations';
@@ -49,6 +49,7 @@ export default function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardCount, setCardCount] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('Tümü');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [lang, setLang] = useState<Lang>(() => {
     const saved = localStorage.getItem('lang');
@@ -97,6 +98,9 @@ export default function App() {
   const [password, setPassword] = useState('');
   
   const [learnedCards, setLearnedCards] = useState<Set<string>>(new Set());
+  const [reviewCards, setReviewCards] = useState<Set<string>>(new Set());
+  const [quickReviewMode, setQuickReviewMode] = useState(false);
+  const [dailyGoal, setDailyGoal] = useState({ date: '', count: 0 });
   
   const [notifications, setNotifications] = useState<{id: number, message: string}[]>([]);
   const notifIdRef = useRef(0);
@@ -110,14 +114,21 @@ export default function App() {
       if (currentUser) {
         try {
           const userDoc = await getDoc(doc(db, `artifacts/${appId}/users`, currentUser.uid));
-          if (userDoc.exists() && userDoc.data().learnedCards) {
-             setLearnedCards(new Set(userDoc.data().learnedCards));
+          if (userDoc.exists()) {
+             const data = userDoc.data();
+             if (data.learnedCards) setLearnedCards(new Set(data.learnedCards));
+             else setLearnedCards(new Set());
+             
+             if (data.reviewCards) setReviewCards(new Set(data.reviewCards));
+             else setReviewCards(new Set());
           } else {
              setLearnedCards(new Set());
+             setReviewCards(new Set());
           }
         } catch(e) {}
       } else {
         setLearnedCards(new Set());
+        setReviewCards(new Set());
       }
     };
     loadUserProgress();
@@ -130,6 +141,25 @@ export default function App() {
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 5000);
   };
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const savedData = localStorage.getItem('dailyGoalData');
+    let data = savedData ? JSON.parse(savedData) : { date: '', count: 0 };
+    
+    if (data.date !== today) {
+      data = { date: today, count: 0 };
+      localStorage.setItem('dailyGoalData', JSON.stringify(data));
+    }
+    setDailyGoal(data);
+
+    if (data.count < 5 && !sessionStorage.getItem('dailyReminderShown')) {
+      setTimeout(() => {
+        showNotification(`Günlük Öğrenme Hedefi: Bugün en az 5 kart öğrenin! (${data.count}/5)`);
+        sessionStorage.setItem('dailyReminderShown', 'true');
+      }, 1500);
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -164,6 +194,18 @@ export default function App() {
       tempDeck = tempDeck.filter(card => card.kategori === selectedCategory || (!card.kategori && selectedCategory === 'Genel'));
     }
 
+    if (quickReviewMode) {
+      tempDeck = tempDeck.filter(card => card.soru && reviewCards.has(card.soru));
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      tempDeck = tempDeck.filter(card => 
+        (card.soru && card.soru.toLowerCase().includes(q)) || 
+        (card.cevap && card.cevap.toLowerCase().includes(q))
+      );
+    }
+
     for (let i = tempDeck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [tempDeck[i], tempDeck[j]] = [tempDeck[j], tempDeck[i]];
@@ -176,7 +218,7 @@ export default function App() {
     setActiveFlashcards(tempDeck);
     setCurrentIndex(0);
     setIsFlipped(false);
-  }, [masterFlashcards, cardCount, selectedCategory]);
+  }, [masterFlashcards, cardCount, selectedCategory, searchQuery, quickReviewMode, reviewCards]);
 
   useEffect(() => {
     const fetchRss = async () => {
@@ -206,6 +248,18 @@ export default function App() {
 
     if (selectedCategory !== 'Tümü') {
       tempDeck = tempDeck.filter(card => card.kategori === selectedCategory || (!card.kategori && selectedCategory === 'Genel'));
+    }
+
+    if (quickReviewMode) {
+      tempDeck = tempDeck.filter(card => card.soru && reviewCards.has(card.soru));
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      tempDeck = tempDeck.filter(card => 
+        (card.soru && card.soru.toLowerCase().includes(q)) || 
+        (card.cevap && card.cevap.toLowerCase().includes(q))
+      );
     }
 
     for (let i = tempDeck.length - 1; i > 0; i--) {
@@ -290,21 +344,60 @@ export default function App() {
   const markCard = async (status: string) => {
     console.log(`Card ${currentIndex + 1} marked as: ${status}`);
     
-    if (status === 'Öğrenildi' && currentCard?.soru) {
-      setLearnedCards(prev => {
-        const newSet = new Set(prev);
-        newSet.add(currentCard.soru);
+    if (currentCard?.soru) {
+      if (status === 'Öğrenildi') {
+        const isNew = !learnedCards.has(currentCard.soru);
+        
+        const newLearned = new Set(learnedCards);
+        newLearned.add(currentCard.soru);
+        const newReview = new Set(reviewCards);
+        newReview.delete(currentCard.soru);
+        
+        setLearnedCards(newLearned);
+        setReviewCards(newReview);
+          
+        if (currentUser) {
+          try {
+            setDoc(doc(db, `artifacts/${appId}/users`, currentUser.uid), {
+              learnedCards: Array.from(newLearned),
+              reviewCards: Array.from(newReview)
+            }, { merge: true });
+          } catch(e) {}
+        }
+  
+        if (isNew) {
+          const today = new Date().toISOString().split('T')[0];
+          setDailyGoal(prev => {
+            const isToday = prev.date === today;
+            const newCount = isToday ? prev.count + 1 : 1;
+            
+            if (newCount === 5) {
+              showNotification('🎉 Tebrikler! Günlük 5 kart öğrenme hedefinize ulaştınız!');
+            }
+            
+            const newData = { date: today, count: newCount };
+            localStorage.setItem('dailyGoalData', JSON.stringify(newData));
+            return newData;
+          });
+        }
+      } else if (status === 'Tekrar Edilecek') {
+        const newLearned = new Set(learnedCards);
+        newLearned.delete(currentCard.soru);
+        const newReview = new Set(reviewCards);
+        newReview.add(currentCard.soru);
+        
+        setLearnedCards(newLearned);
+        setReviewCards(newReview);
         
         if (currentUser) {
           try {
             setDoc(doc(db, `artifacts/${appId}/users`, currentUser.uid), {
-              learnedCards: Array.from(newSet)
+              learnedCards: Array.from(newLearned),
+              reviewCards: Array.from(newReview)
             }, { merge: true });
           } catch(e) {}
         }
-        
-        return newSet;
-      });
+      }
     }
     
     nextCard();
@@ -925,6 +1018,30 @@ export default function App() {
         
         <div className="flex flex-wrap items-center gap-4 border-l border-slate-200 dark:border-slate-700 pl-4 ml-auto">
           <div className="flex items-center gap-2">
+            <button
+              title={(texts as any).quickReview}
+              onClick={() => {
+                if (!quickReviewMode && reviewCards.size === 0) {
+                  showNotification((texts as any).quickReviewEmpty);
+                  return;
+                }
+                setQuickReviewMode(!quickReviewMode);
+              }}
+              className={`px-2 py-1.5 rounded-lg border flex items-center justify-center transition-colors ${quickReviewMode ? 'bg-red-100 border-red-300 text-red-700 dark:bg-red-900/50 dark:border-red-700/60 dark:text-red-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}
+            >
+              <RefreshCw size={16} />
+              <span className="ml-1.5 text-xs sm:text-sm font-medium hidden md:block">{(texts as any).quickReview}</span>
+            </button>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+              <input
+                type="text"
+                placeholder={texts.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-medium w-32 sm:w-40 lg:w-48 placeholder-slate-400 dark:placeholder-slate-500 transition-all"
+              />
+            </div>
             <select 
               title="Kategori Seçimi"
               id="card-category" 

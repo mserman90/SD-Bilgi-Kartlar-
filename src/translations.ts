@@ -61,6 +61,10 @@ export const t = {
     badgeAnalyst: 'Havza Analisti',
     badgeResearcher: 'Araştırmacı',
     badgeApprentice: 'Çırak',
+    search: "Arama",
+    searchPlaceholder: "Kelime ara...",
+    quickReview: "Hızlı Tekrar",
+    quickReviewEmpty: "Tekrar edilecek kart bulunmuyor.",
     
     aboutAimTitle: "Amacımız",
     aboutAimDesc: "Bu uygulama, 'Su Diplomasisi' (Water Diplomacy) alanındaki kavram, antlaşma ve terimlerin hızlı ve etkileşimli bir şekilde öğrenilmesini sağlamak amacıyla geliştirilmiştir. Öğrenciler, araştırmacılar ve alan profesyonelleri için yapılandırılmış bir pratik çalışma aracıdır.",
@@ -138,6 +142,10 @@ export const t = {
     badgeAnalyst: 'Basin Analyst',
     badgeResearcher: 'Researcher',
     badgeApprentice: 'Apprentice',
+    search: "Search",
+    searchPlaceholder: "Search keyword...",
+    quickReview: "Quick Review",
+    quickReviewEmpty: "No cards to review.",
     
     aboutAimTitle: "Our Aim",
     aboutAimDesc: "This application is developed to enable fast and interactive learning of concepts, treaties, and terms in the field of 'Water Diplomacy'. It serves as a structured practice tool for students, researchers, and field professionals.",
