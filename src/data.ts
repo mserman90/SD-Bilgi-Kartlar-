@@ -4,6 +4,7 @@ export interface Flashcard {
   cevap: string;
   cevap_atif?: string;
   kategori?: string;
+  ipucu?: string;
 }
 
 export const baseFlashcards: Flashcard[] = [
@@ -11,19 +12,15 @@ export const baseFlashcards: Flashcard[] = [
         soru: "Routledge Su Diplomasisi El Kitabı (Handbook of Water Diplomacy), su yönetimi süreçlerini analiz ederken hangi iki temel ekseni kullanır?",
         soru_atif: "Islam, S., Smith, K. M., Klimes, M., & Salzberg, A. (2025). Routledge Handbook of Water Diplomacy. Routledge.",
         cevap: "Süreçleri 'Birlikte Çalışmak' (Working Together) ve 'Neyin Önemli Olduğu ve Nedenleri' (What Matters and Why) olmak üzere iki ana yola ayırır.",
-        cevap_atif: "Islam, S., Smith, K. M., Klimes, M., & Salzberg, A. (2025). Routledge Handbook of Water Diplomacy (s. 2). Routledge. Alındığı tarih: 4 Haziran 2026."
-    },
-    {
-        soru: "AquaPedia platformunun karmaşık su çatışmalarının çözümündeki benzersiz 'Yaşayan El Kitabı' (Living Handbook) rolü nedir?",
-        soru_atif: "Landman, M., & Bolotova, R. (2025). A Living Handbook: Connecting Handbook Contents with the AquaPedia Case Study Database. In Routledge Handbook of Water Diplomacy (s. 45).",
-        cevap: "AquaPedia, doğal bilimsel ve mühendislik verilerini sosyo-kültürel ve politik analizlerle birleştirerek, akran denetimli interaktif bir vaka veri tabanı sunar.",
-        cevap_atif: "Tufts University. (2008). AquaPedia. Alındığı tarih: 4 Haziran 2026, http://aquapedia.waterdiplomacy.org"
+        cevap_atif: "Islam, S., Smith, K. M., Klimes, M., & Salzberg, A. (2025). Routledge Handbook of Water Diplomacy (s. 2). Routledge. Alındığı tarih: 4 Haziran 2026.",
+        ipucu: "İki temel yola ayrıldığını düşünün, biri 'birlikte çalışmayı' (Working Together), diğeri ise 'önem ve nedenleri' (What Matters and Why) vurgular."
     },
     {
         soru: "Colorado Nehri Havzası'nda (1922-2022) tanımlanan dört temel su yönetimi eylem türü nelerdir?",
         soru_atif: "Fleck, J. (2016). Water is for fighting over. Island Press. (Aktaran: Institutional analysis of water governance in the Colorado River Basin).",
         cevap: "Tedarik (fiziksel su miktarı), Depolama (muhafaza), Taşıma (fiziksel nakil) ve Kullanım (tüketim).",
-        cevap_atif: "Semantic Scholar. (2025). Institutional Analysis of Water Governance in the Colorado River Basin, 1922-2022. Alındığı tarih: 4 Haziran 2026."
+        cevap_atif: "Semantic Scholar. (2025). Institutional Analysis of Water Governance in the Colorado River Basin, 1922-2022. Alındığı tarih: 4 Haziran 2026.",
+        ipucu: "Su kaynaklarının fiziksel bulunabilirliği (tedarik), saklanması (depolama), nakli (taşıma) ve harcanması (kullanım) süreçleri."
     },
     {
         soru: "Helmand Nehri Havzası'ndaki veri paylaşım eksikliği hangi devletler arasında tarihsel bir soruna yol açmıştır?",
@@ -80,12 +77,6 @@ export const baseFlashcards: Flashcard[] = [
         cevap_atif: "Astrophysics Data System [ADS]. (2010). Water Diplomacy: A Synthesis of Explicit and Tacit Water Information."
     },
     {
-        soru: "Tufts Üniversitesi tarafından geliştirilen AquaPedia veri tabanının kuruluş yılı ve temel amacı nedir?",
-        soru_atif: "Islam, S., Moomaw, W., Akanda, A.S., vd. (2009). AquaPedia: Building Capacity to Resolve Water Conflicts.",
-        cevap: "2008 yılında kurulmuştur. Amacı, bilimsel/mühendislik boyutları ile sosyo-kültürel meseleleri entegre eden etkileşimli su vakalarını küresel olarak paylaşmaktır.",
-        cevap_atif: "Wikipedia. (2026). AquaPedia. Alındığı tarih: 4 Haziran 2026."
-    },
-    {
         soru: "Kızıldeniz-Ölüdeniz Su Taşıma Projesi (Red Sea-Dead Sea Water Conveyance) su diplomasisinde hangi bölgeyi ilgilendirmektedir?",
         soru_atif: "Wikipedia. (2026). Red Sea–Dead Sea Water Conveyance. Alındığı tarih: 4 Haziran 2026.",
         cevap: "Proje temel olarak Ürdün, İsrail ve Filistin (Ölüdeniz havzası) arasındaki su tahsisi, çevre koruma ve diplomatik ilişkileri ilgilendirmektedir.",
@@ -120,12 +111,6 @@ export const baseFlashcards: Flashcard[] = [
         soru_atif: "Loodin, N., vd. (2025). Reframing A Data Sharing Mechanism for the Riparian Nations of Helmand River Basin.",
         cevap: "Ortak veri şeffaflığı olmadan taraflar arasında güven inşası, hidrolojik modelleme ve hakkaniyetli su tahsisi müzakerelerinin yürütülmesi mümkün değildir.",
         cevap_atif: "Loodin, N., vd. (2025). Texas A&M Law Scholarship."
-    },
-    {
-        soru: "Massachusetts Teknoloji Enstitüsü'nde (MIT) verilen 11.382 kodlu Su Diplomasisi (Water Diplomacy) dersinin pratik çıktısı nedir?",
-        soru_atif: "DUSP, MIT Department of Urban Studies and Planning. (2021). A Decade of Science Diplomacy.",
-        cevap: "Öğrencilerin küresel su çatışmalarını inceleyerek ürettiği vaka çalışmaları (case studies), açık erişimli AquaPedia Veri Tabanı'nda derlenmekte ve paylaşılmaktadır.",
-        cevap_atif: "DUSP, MIT. (2021). A Decade of Science Diplomacy."
     },
     {
         soru: "Sınıraşan suların yönetiminde 'Hidrosolidarite' (Hydrosolidarity) kavramı neyi ifade eder?",
@@ -212,12 +197,6 @@ export const baseFlashcards: Flashcard[] = [
         cevap_atif: "Murthy, S. L., & Mendikulova, F. (2017). s. 421."
     },
     {
-        soru: "AquaPedia Veri Tabanını standart bir çevrimiçi ansiklopediden (örn. genel Wikipedia) ayıran en önemli özellik nedir?",
-        soru_atif: "Islam, S., vd. (2009). AquaPedia: Building Capacity to Resolve Water Conflicts.",
-        cevap: "Karmaşık su anlaşmazlıklarının bilimsel/mühendislik modelleri ile sosyo-kültürel analizlerini akran denetiminden geçirerek birleştiren, amaca yönelik (actionable knowledge) özel bir sistem olmasıdır.",
-        cevap_atif: "Tufts University. (2008). AquaPedia. Alındığı tarih: 4 Haziran 2026."
-    },
-    {
         soru: "Mühendislik Diplomasisi (Engineering Diplomacy) yaklaşımı su altyapı projelerine nasıl bir boyut kazandırır?",
         soru_atif: "MDPI. (2026). Engineering Diplomacy for Water Sustainability.",
         cevap: "Baraj ve kanalların sadece teknik/inşaat mühendisliği yapıları olmadığını; tasarımlarının toplumsal bağları, güveni ve diplomatik ilişkileri etkileyen birer sosyal müdahale olduğunu öngörür.",
@@ -288,12 +267,6 @@ export const baseFlashcards: Flashcard[] = [
         soru_atif: "Salewicz, K. A., & Nakayama, M. (2025). The Rogun Dam project: evolution from conflict to cooperation.",
         cevap: "Özbekistan'ın kış aylarında Tacikistan'a kömür ve doğal gaz sağlaması (enerji desteği), karşılığında Tacikistan'ın yaz aylarında baraj kapaklarını açarak sulama suyu sağlaması prensibine dayanmıştır.",
         cevap_atif: "Frontiers in Water. (2025). The Rogun Dam project. Alındığı tarih: 4 Haziran 2026."
-    },
-    {
-        soru: "CEO Water Mandate tarafından 2018'de belgelenen AquaPedia platformunun kurumsal sürdürülebilirlik (SDG) hedeflerindeki ana işlevleri nelerdir?",
-        soru_atif: "CEO Water Mandate. (2018). Aquapedia (2018).",
-        cevap: "SDG 6.5 (Entegre Su Yönetimi), SDG 6.6 (Ekosistemler) ve Kurumsal paydaş diyaloğunu artırarak su stresi ile toplumsal su eğitimi kapasitesini geliştirmektir.",
-        cevap_atif: "CEO Water Mandate. (2018). Aquapedia (2018). Alındığı tarih: 4 Haziran 2026."
     },
     {
         soru: "California Water Education Foundation tarafından sunulan Aquapedia modülünde hangi spesifik veriler sunulmaktadır?",
@@ -408,12 +381,6 @@ export const baseFlashcards: Flashcard[] = [
         soru_atif: "Routledge Handbook of Water Diplomacy. (2025). Index: weather forecasting, artificial intelligence (AI) (s. 43). Routledge.",
         cevap: "Büyük iklim ve akış verilerini analiz ederek aşırı hava olaylarını, kuraklık risklerini ve su rejimindeki ani değişimleri tahmin etmek, böylece diplomatlara erken uyarı sağlamaktır.",
         cevap_atif: "Routledge Handbook of Water Diplomacy. (2025). Routledge. Alındığı tarih: 4 Haziran 2026."
-    },
-    {
-        soru: "Tufts Üniversitesi tarafından geliştirilen 'Water 2100' projesi AquaPedia'yı nasıl konumlandırmaktadır?",
-        soru_atif: "Islam, S., Gao, Y., & Akanda, A. S. (2010). Water 2100: A synthesis of natural and societal domains to create actionable knowledge through AquaPedia. Paris, France.",
-        cevap: "21. yüzyılın karmaşık su sorunlarını çözebilmek için doğal (hidrolojik) ve toplumsal alanları sentezleyerek sahada 'uygulanabilir bilgi' (actionable knowledge) üreten merkezi bir araç olarak konumlandırır.",
-        cevap_atif: "Islam, S., vd. (2010). Proceedings of the 10th Kovacs Colloquium (s. 193-197). Alındığı tarih: 4 Haziran 2026."
     },
     {
         soru: "MENA (Orta Doğu ve Kuzey Afrika) Bölgesi için tasarlanan su diplomasisi eğitim programlarının birincil amacı nedir?",
@@ -606,6 +573,102 @@ export const baseFlashcards: Flashcard[] = [
         soru_atif: "European Parliament and Council. (2000). Directive 2000/60/EC establishing a framework for Community action in the field of water policy.",
         cevap: "Su fiyatlandırmasında, 'kirleten öder' ilkesine uygun olarak, sadece suyun altyapı maliyetlerinin değil, suyun tüketilmesi ve kirlenmesinden doğan 'çevresel ve kaynak maliyetlerinin' (environmental and resource costs) de fiyatlara yansıtılmasını zorunlu kılar.",
         cevap_atif: "Directive 2000/60/EC (Water Framework Directive). Alındığı tarih: 4 Haziran 2026."
+    },
+    {
+        soru: "BM İklim Değişikliği Çerçeve Sözleşmesi (UNFCCC) kapsamında kurulan Yeşil İklim Fonu (GCF), su projelerini desteklerken hangi temel kriteri esas almaktadır?",
+        soru_atif: "Green Climate Fund. (2023). Water Security Sectoral Guide.",
+        cevap: "Projelerin, iklim değişikliğinin etkilerine uyum sağlamada ne kadar yenilikçi ve dayanıklı olduğunu, ayrıca emisyon azaltımına ne kadar katkıda bulunduğunu gösteren 'iklim rasyonalitesi' (climate rationale) kriterini esas alır.",
+        cevap_atif: "GCF. (2023). Sectoral Guide: Water Security. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Rio Deklarasyonu'nun 'İhtiyatlılık İlkesi' (Precautionary Principle) sınıf ötesi su kaynakları yönetiminde ne anlama gelmektedir?",
+        soru_atif: "United Nations. (1992). Rio Declaration on Environment and Development.",
+        cevap: "Ciddi veya geri döndürülemez çevresel hasar tehditlerinin bulunduğu durumlarda, tam bilimsel kesinliğin olmamasının, çevresel bozulmayı önleyici tedbirleri ertelemek için bir mazeret olarak kullanılamayacağı anlamına gelir.",
+        cevap_atif: "Rio Declaration on Environment and Development, Principle 15. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Birleşmiş Milletler Su (UN-Water) inisiyatifi tarafından küresel su işbirliğini teşvik etmek amacıyla vurgulanan temel stratejik hedef nedir?",
+        soru_atif: "UN-Water. (2023). Blueprint for Acceleration: Sustainable Development Goal 6 Synthesis Report on Water and Sanitation.",
+        cevap: "Sınır aşan su kaynaklarının entegre ve adil yönetimini teşvik etmek, iklim değişikliğine uyum kapasitesini artırmak ve hidro-politik gerilimleri barışçıl diplomasi araçlarıyla çözmektir.",
+        cevap_atif: "UN-Water SDG 6 Synthesis Report. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su diplomasisinde 'Pozitif Toplamlı Oyun' (Positive-Sum Game) yaklaşımının temel amacı nedir?",
+        soru_atif: "Susskind, L., & Islam, S. (2012). Water Diplomacy: A Negotiated Approach to Manage Complex Water Problems.",
+        cevap: "Kaynakların kısıtlı ve sabit olduğu varsayımını aşarak, suyun değer ve faydalarını havzadaki farklı sektörler (enerji, tarım, çevre) arasında birleştirerek veya takas ederek tarafların karşılıklı kazanç sağlamasını (win-win) amaçlar.",
+        cevap_atif: "Susskind & Islam, Water Diplomacy. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Dünya Bankası'nın desteklediği 'Havza Çapında Hidrolojik Modelleme' (Basin-Wide Hydrological Modeling) çalışmaları uluslararası su müzakerelerine nasıl bir katkı sunar?",
+        soru_atif: "World Bank. (2018). Water in the Balance: The Economic Impacts of Climate Change and Water Scarcity.",
+        cevap: "Tahmini senaryolar ve güvenilir veriler üreterek, müzakere eden ülkelerin kendi asgari pozisyonları dışındaki faktörleri objektif olarak değerlendirmesini kolaylaştırır ve karar verme sürecini güçlendirir.",
+        cevap_atif: "World Bank. (2018). Water in the Balance. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su diplomasisinde 'Track 2' (İkinci Yol) diplomasisi hangi aktörleri ve süreçleri kapsar?",
+        soru_atif: "U.N. Water. (2020). Water Diplomacy and Conflict Prevention.",
+        cevap: "Resmi devlet yetkilileri yerine akademisyenler, sivil toplum kuruluşları ve su uzmanları arasında yürütülen gayri resmi ve gayri bağlayıcı diyalog süreçlerini kapsar.",
+        cevap_atif: "U.N. Water. (2020). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su müzakerelerinde 'Fayda Paylaşımı' (Benefit Sharing) yaklaşımını geleneksel su bölüşümünden (Water Allocation) ayıran temel fark nedir?",
+        soru_atif: "Sadoff, C. W., & Grey, D. (2002). Beyond the river: the benefits of cooperation on international rivers.",
+        cevap: "Sadece fiziksel suyun hacimsel (m³) olarak parsellenmesi yerine, suyun getirdiği ekonomik, sosyal ve çevresel faydaların tüm havza çapında maksimize edilerek paylaşılmasını esas almasıdır.",
+        cevap_atif: "Sadoff & Grey, Water Policy. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Ortak Bilgi Üretimi (Joint Fact-Finding) yönteminin sınır aşan su diplomasisindeki temel işlevi nedir?",
+        soru_atif: "Islam, S., & Susskind, L. (2012). Water Diplomacy: A Negotiated Approach.",
+        cevap: "Müzakere eden tarafların veriler ve bilimsel modeller üzerinde uzlaşmasını sağlayarak, tek bir kabul edilmiş bilgi temeli yaratması ve güven inşasını hızlandırmasıdır.",
+        cevap_atif: "Islam & Susskind, 2012. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "İklim değişikliğinin hidro-diplomasideki 'Tehdit Çarpanı' (Threat Multiplier) rolü ne anlama gelir?",
+        soru_atif: "CNA Corporation. (2007). National Security and the Threat of Climate Change.",
+        cevap: "İklim değişikliğinin tek başına bir savaş nedeni olmaktan çok, mevcut sosyo-ekonomik zorlukları su kıtlığı ve aşırı olaylar yoluyla derinleştirerek diplomatik gerilimleri artırması anlamına gelir.",
+        cevap_atif: "CNA Corporation (2007). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Hidropolitik literatüründe 'Sanal Su Ticareti' (Virtual Water Trade), suya dayalı çatışmaları nasıl hafifletebilir?",
+        soru_atif: "Allan, J. A. (1998). Virtual Water: A Strategic Resource.",
+        cevap: "Su fakiri ülkelerin suyu yoğun tüketen tarım ürünlerini üretmek yerine ithal etmeleri stratejisiyle, kıt ulusal su kaynakları üzerindeki baskıyı ve sınır aşan nehirlerdeki rekabeti azaltabilmesidir.",
+        cevap_atif: "Allan, J.A. (1998). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Uluslararası su hukukunda 'Zarar Vermeme İlkesi' ile 'Adil ve Makul Kullanım İlkesi' arasında ortaya çıkan temel uyuşmazlık diplomatik olarak hangi ülkeler arasındadır?",
+        soru_atif: "U.N. Watercourses Convention (1997).",
+        cevap: "Genellikle suları kullanmak isteyen yukarı kıyıdaş (menba) ülkelerin 'Adil Kullanım'ı, mevcut hidro-altyapılarının zarar göreceğinden endişe eden aşağı kıyıdaş (mansap) ülkelerin ise 'Zarar Vermeme' ilkesini savunmaları arasında ortaya çıkar.",
+        cevap_atif: "UNWC (1997). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su diplomasisinde uzaktan algılama (Remote Sensing) gibi açık veri teknolojilerinin müzakerelere sağladığı temel katkı nedir?",
+        soru_atif: "Gleick, P. H. (2014). Water, Drought, Climate Change, and Conflict in Syria.",
+        cevap: "Ülkelerin ulusal hidrolojik verilerini saklama veya siyasi amaçlarla manipüle etme riskine karşı, tarafsız ve doğrulanabilir bilgi sağlayarak taraflar arası şeffaflığı ve güveni artırmasıdır.",
+        cevap_atif: "Gleick (2014) / Pacific Institute. Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Desalinasyon (Tuzdan Arındırma) alanındaki teknolojik gelişmelerin özellikle Orta Doğu su diplomasisindeki olumlu jeopolitik yansıması ne olmaktadır?",
+        soru_atif: "Avner, V. (2018). Advanced Water Technologies and the Middle East.",
+        cevap: "Doğal ve sınır aşan tatlı su kaynaklarına olan yaşamsal bağımlılığı belli bir ölçüde kırarak, bu kaynaklar üzerindeki hidro-politik rekabeti ve sıfır toplamlı oyun baskısını esnetebilmesidir.",
+        cevap_atif: "Avner, V. (2018). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Su çatışmalarının çözümünde sıkça başvurulan 'Paket Anlaşma' (Package Deal) hidropolitik bağlamında nasıl işler?",
+        soru_atif: "Dinar, S. (2008). International Water Treaties: Negotiation and Cooperation along Transboundary Rivers.",
+        cevap: "Müzakerelerde yalnızca su tahsisi veya debi miktarının değil; enerji paylaşımı, ikili ticaret, güvenlik veya pazar erişimi gibi hidro-dışı (non-water) meselelerin de aynı anlaşmaya entegre edilerek pazarlık alanının genişletilmesidir.",
+        cevap_atif: "Dinar, S. (2008). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "Havza yönetimini temel alan 'Bağlantı Çözümü' (WEF Nexus - Water, Energy, Food) diplomasiye nasıl bir vizyon katar?",
+        soru_atif: "Hoff, H. (2011). Understanding the Nexus.",
+        cevap: "Su, enerji üretimi ve gıda güvenliği sektörlerinin birbirine organik olarak bağlı olduğunu kabul ederek, müzakerelerde sadece tekil tahsisin değil, bu üç alanın ortak optimize edilmesini sağlar.",
+        cevap_atif: "Bonn2011 Conference (Hoff, 2011). Alındığı tarih: 5 Haziran 2026."
+    },
+    {
+        soru: "'Önleyici Su Diplomasisi' (Preventive Water Diplomacy) kavramının stratejik önceliği (odağı) nedir?",
+        soru_atif: "Schmeier, S. (2018). The Role of River Basin Organizations in Conflict Prevention.",
+        cevap: "Suya bağlı gerilim ve krizler akut güvenlik sorunlarına (şiddete) dönüşmeden önce kurumsal işbirliği, veri paylaşımı ve erken uyarı sistemleri ile sorunların barışçıl diplomasi kanallarıyla sınırlandırılmasıdır.",
+        cevap_atif: "Schmeier, S. (2018). Alındığı tarih: 5 Haziran 2026."
     }
 ];
 

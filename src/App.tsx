@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Settings, LogOut, Download, Upload, Info, Scale, Droplets, Globe, Leaf, Lightbulb, Moon, Sun, User as UserIcon, LogIn, UserPlus, X, ChevronLeft, ChevronRight, Check, RefreshCw, RotateCcw, MessageSquare, AlertTriangle } from 'lucide-react';
+import { Settings, LogOut, Download, Upload, Info, Scale, Droplets, Globe, Leaf, Lightbulb, Moon, Sun, User as UserIcon, LogIn, UserPlus, X, ChevronLeft, ChevronRight, Check, RefreshCw, RotateCcw, MessageSquare, AlertTriangle, Award, Share2, HelpCircle } from 'lucide-react';
 import { auth, db, appId } from './firebase';
 import { baseFlashcards, Flashcard } from './data';
+import { t, Lang } from './translations';
 import { 
   onAuthStateChanged, 
   GoogleAuthProvider, 
@@ -11,7 +12,7 @@ import {
   signOut,
   User
 } from 'firebase/auth';
-import { doc, setDoc, onSnapshot, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot, collection, serverTimestamp } from 'firebase/firestore';
 
 const ADMIN_EMAIL = "serdarerman@gmail.com";
 
@@ -49,6 +50,19 @@ export default function App() {
   const [cardCount, setCardCount] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('Tümü');
   
+  const [lang, setLang] = useState<Lang>(() => {
+    const saved = localStorage.getItem('lang');
+    if (saved === 'en' || saved === 'tr') return saved;
+    // Always default to Turkish
+    return 'tr';
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('lang', lang);
+  }, [lang]);
+
+  const texts = t[lang];
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
@@ -72,6 +86,7 @@ export default function App() {
   const [showUnauthorizedModal, setShowUnauthorizedModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showHintModal, setShowHintModal] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackType, setFeedbackType] = useState('görüş');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -81,12 +96,32 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
+  const [learnedCards, setLearnedCards] = useState<Set<string>>(new Set());
+  
   const [notifications, setNotifications] = useState<{id: number, message: string}[]>([]);
   const notifIdRef = useRef(0);
 
   const [rssItems, setRssItems] = useState<RssItem[]>([]);
   const [rssLoading, setRssLoading] = useState(true);
   const [rssError, setRssError] = useState(false);
+
+  useEffect(() => {
+    const loadUserProgress = async () => {
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, `artifacts/${appId}/users`, currentUser.uid));
+          if (userDoc.exists() && userDoc.data().learnedCards) {
+             setLearnedCards(new Set(userDoc.data().learnedCards));
+          } else {
+             setLearnedCards(new Set());
+          }
+        } catch(e) {}
+      } else {
+        setLearnedCards(new Set());
+      }
+    };
+    loadUserProgress();
+  }, [currentUser]);
 
   const showNotification = (message: string) => {
     const id = notifIdRef.current++;
@@ -207,8 +242,26 @@ export default function App() {
     }
   };
 
-  const markCard = (status: string) => {
+  const markCard = async (status: string) => {
     console.log(`Card ${currentIndex + 1} marked as: ${status}`);
+    
+    if (status === 'Öğrenildi' && currentCard?.soru) {
+      setLearnedCards(prev => {
+        const newSet = new Set(prev);
+        newSet.add(currentCard.soru);
+        
+        if (currentUser) {
+          try {
+            setDoc(doc(db, `artifacts/${appId}/users`, currentUser.uid), {
+              learnedCards: Array.from(newSet)
+            }, { merge: true });
+          } catch(e) {}
+        }
+        
+        return newSet;
+      });
+    }
+    
     nextCard();
   };
 
@@ -248,6 +301,7 @@ export default function App() {
     setShowLoginModal(false);
     setShowInfoModal(false);
     setShowFeedbackModal(false);
+    setShowHintModal(false);
     setFeedbackSuccess(false);
     setFeedbackMessage('');
   };
@@ -408,10 +462,41 @@ export default function App() {
 
   const currentCard = activeFlashcards[currentIndex];
   
+  const getBadge = (count: number) => {
+    if (count >= 50) return { title: 'Su Diplomasisi Uzmanı', color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900/40' };
+    if (count >= 25) return { title: 'Havza Analisti', color: 'text-indigo-500', bg: 'bg-indigo-100 dark:bg-indigo-900/40' };
+    if (count >= 10) return { title: 'Araştırmacı', color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/40' };
+    return { title: 'Çırak', color: 'text-slate-500', bg: 'bg-slate-100 dark:bg-slate-800' };
+  };
+
+  const handleShareBadge = async () => {
+    const badge = getBadge(learnedCards.size);
+    const shareText = `Su Diplomasisi uygulamasında toplam ${learnedCards.size} kart öğrenerek '${badge.title}' unvanını kazandım! Sen de katıl 💦`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Su Diplomasisi Başarım',
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Paylaşım iptal edildi veya desteklenmiyor.');
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+        showNotification("Panoya kopyalandı!");
+      } catch (err) {
+        showNotification("Kopyalama başarısız oldu.");
+      }
+    }
+  };
+
   const renderModals = () => (
     <>
       {/* Modals Overlay */}
-      {(showLoginModal || showAdminModal || showUserModal || showUnauthorizedModal || showInfoModal) && (
+      {(showLoginModal || showAdminModal || showUserModal || showUnauthorizedModal || showInfoModal || showHintModal) && (
         <div className="fixed inset-0 bg-black/50 z-[2000]" onClick={closeModals} />
       )}
 
@@ -458,14 +543,55 @@ export default function App() {
       {/* User Modal */}
       {showUserModal && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-sm text-center border border-slate-100 dark:border-slate-700">
-          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">Kullanıcı Profili</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Hoş geldiniz, <br/><span className="font-bold text-slate-800 dark:text-slate-200">{currentUser?.email}</span></p>
+          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">{texts.userProfile}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Hoş geldiniz, <br/><span className="font-bold text-slate-800 dark:text-slate-200">{currentUser?.email}</span></p>
           
-          <div className="flex justify-center gap-4 w-full mt-4">
-            <button onClick={handleLogout} title="Çıkış Yap" className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
+          <div className="mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 flex flex-col items-center shadow-sm">
+            {(() => {
+              const badge = getBadge(learnedCards.size);
+              return (
+                <>
+                  <div className={`p-4 rounded-full mb-3 ${badge.bg}`}>
+                    <Award size={36} className={badge.color} />
+                  </div>
+                  <h3 className={`font-bold text-lg mb-1 leading-tight ${badge.color}`}>{badge.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Öğrenilen Kart: <strong className="text-slate-700 dark:text-slate-300">{learnedCards.size}</strong>
+                  </p>
+                  
+                  <div className="w-full mt-4">
+                    <div className="w-full bg-slate-200 dark:bg-slate-600 rounded-full h-1.5 overflow-hidden">
+                      <div 
+                        className="bg-blue-500 h-1.5 rounded-full transition-all duration-500" 
+                        style={{ width: `${Math.min((learnedCards.size / (learnedCards.size < 10 ? 10 : learnedCards.size < 25 ? 25 : 50)) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    {learnedCards.size < 50 ? (
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                        Sonraki rozete {(learnedCards.size < 10 ? 10 : learnedCards.size < 25 ? 25 : 50) - learnedCards.size} kart kaldı
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-yellow-500 mt-2 font-medium">En yüksek rütbeye ulaştınız!</p>
+                    )}
+                  </div>
+                  
+                  <button 
+                    onClick={handleShareBadge} 
+                    title="Paylaş" 
+                    className="mt-4 flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/80 w-full py-2.5 rounded-lg font-medium text-sm transition-colors"
+                  >
+                    <Share2 size={16} /> Paylaş
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+          
+          <div className="flex justify-center gap-4 w-full mt-2">
+            <button onClick={handleLogout} title={texts.logout} className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
               <LogOut size={20} />
             </button>
-            <button onClick={closeModals} title="Kapat" className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={closeModals} title={texts.close} className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -475,25 +601,25 @@ export default function App() {
       {/* Admin Modal */}
       {showAdminModal && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-sm text-center border border-slate-100 dark:border-slate-700">
-          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">Veritabanı Yönetimi</h2>
+          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">{texts.databaseManagement}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Hoş geldiniz, <span className="font-bold text-slate-800 dark:text-slate-200">{currentUser?.email}</span></p>
           
           <input type="file" id="file-upload" accept=".json, .csv" className="hidden" onChange={handleFileUpload} />
           
           <div className="flex justify-center flex-wrap gap-4 w-full mt-4">
-            <button onClick={exportJSON} title="JSON Olarak İndir" className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors relative">
+            <button onClick={exportJSON} title={texts.downloadJSON} className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors relative">
               <span className="relative flex items-center justify-center w-full h-full"><Download size={20} /><span className="absolute -bottom-1 right-0 text-[9px] font-bold">JSN</span></span>
             </button>
             <button onClick={exportCSV} title="CSV Olarak İndir" className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors relative">
               <span className="relative flex items-center justify-center w-full h-full"><Download size={20} /><span className="absolute -bottom-1 right-0 text-[9px] font-bold">CSV</span></span>
             </button>
-            <button onClick={() => document.getElementById('file-upload')?.click()} title="Veri Yükle (JSON/CSV)" className="w-12 h-12 bg-emerald-100 border-transparent text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/80 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={() => document.getElementById('file-upload')?.click()} title={texts.uploadJSONCSV} className="w-12 h-12 bg-emerald-100 border-transparent text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/80 rounded-full flex items-center justify-center transition-colors">
               <Upload size={20} />
             </button>
-            <button onClick={handleLogout} title="Çıkış Yap" className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={handleLogout} title={texts.logout} className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
               <LogOut size={20} />
             </button>
-            <button onClick={closeModals} title="Kapat" className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={closeModals} title={texts.close} className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -503,16 +629,16 @@ export default function App() {
       {/* Unauthorized Modal */}
       {showUnauthorizedModal && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-sm text-center border border-slate-100 dark:border-slate-700">
-          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">Yetkisiz Erişim</h2>
+          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">{texts.unauthorizedAccess}</h2>
           <p className="text-sm text-slate-700 dark:text-slate-300 mb-6 leading-relaxed">
             Giriş yaptığınız hesap: <br/><strong className="text-slate-900 dark:text-slate-100">{currentUser?.email}</strong><br/><br/>
             Yönetim paneline erişim yetkisi sadece sistem yöneticisine (serdarerman@gmail.com) aittir.
           </p>
           <div className="flex justify-center gap-4 w-full mt-4">
-            <button onClick={handleLogout} title="Hesaptan Çıkış Yap" className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={handleLogout} title={texts.logout} className="w-12 h-12 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors">
               <LogOut size={20} />
             </button>
-            <button onClick={closeModals} title="İptal" className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={closeModals} title={texts.cancel} className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -526,7 +652,7 @@ export default function App() {
             <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg text-blue-600 dark:text-blue-400 shadow-sm">
               <Info size={24} />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Uygulama Hakkında</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{texts.aboutApp}</h2>
           </div>
           
           <div className="space-y-6 text-sm text-slate-700 dark:text-slate-300 leading-relaxed text-left">
@@ -559,7 +685,7 @@ export default function App() {
           </div>
           
           <div className="flex justify-center mt-7 pt-5 border-t border-slate-100 dark:border-slate-800">
-            <button onClick={closeModals} title="Okudum, Kapat" className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={closeModals} title={texts.readClose} className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -569,7 +695,7 @@ export default function App() {
       {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-sm text-center border border-slate-100 dark:border-slate-700">
-          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">Geri Bildirim</h2>
+          <h2 className="text-xl font-bold mb-1 text-slate-900 dark:text-slate-100">{texts.feedbackTitle}</h2>
           
           {feedbackSuccess ? (
             <div className="py-6 px-4">
@@ -626,6 +752,26 @@ export default function App() {
           )}
         </div>
       )}
+
+      {/* Hint Modal */}
+      {showHintModal && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 p-8 rounded-xl z-[2001] shadow-2xl w-[90%] max-w-sm text-center border border-slate-100 dark:border-slate-700">
+          <div className="flex justify-center mb-4">
+            <div className="p-4 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+              <HelpCircle size={36} />
+            </div>
+          </div>
+          <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">{texts.hint}</h2>
+          <p className="text-sm text-slate-700 dark:text-slate-300 mb-6 leading-relaxed">
+            {currentCard?.ipucu || texts.noHint}
+          </p>
+          <div className="flex justify-center mt-6">
+            <button onClick={() => setShowHintModal(false)} title={texts.close} className="w-12 h-12 bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 
@@ -648,7 +794,7 @@ export default function App() {
           <div className="absolute top-5 left-5 flex gap-2 z-40">
             <button 
               onClick={openUserPanel}
-              title={currentUser ? 'Profilim' : 'Giriş / Kayıt'}
+              title={currentUser ? texts.myProfile : texts.loginRegister}
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 border p-3 rounded-full transition-colors flex items-center justify-center shadow-lg backdrop-blur-sm"
             >
               <UserIcon size={20} />
@@ -656,7 +802,7 @@ export default function App() {
             {(!currentUser || currentUser.email?.toLowerCase() === ADMIN_EMAIL) && (
               <button 
                 onClick={openAdminPanel}
-                title="Yönetim Paneli"
+                title={texts.adminPanel}
                 className="bg-white/10 border-white/20 text-white hover:bg-white/20 border p-3 rounded-full transition-colors flex items-center justify-center shadow-lg backdrop-blur-sm"
               >
                 <Settings size={20} />
@@ -666,6 +812,12 @@ export default function App() {
 
           <div className="absolute top-5 right-5 flex gap-2 z-40">
             <button
+              onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 border p-3 rounded-full transition-colors flex items-center justify-center shadow-lg backdrop-blur-sm font-bold text-xs w-11 h-11 uppercase"
+            >
+              {lang}
+            </button>
+            <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               title="Tema Değiştir"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 border p-3 rounded-full transition-colors flex items-center justify-center shadow-lg backdrop-blur-sm"
@@ -674,7 +826,7 @@ export default function App() {
             </button>
             <button 
               onClick={() => setShowFeedbackModal(true)}
-              title="Geri Bildirim Gönder"
+              title={texts.feedbackTitle}
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 border p-3 rounded-full transition-colors flex items-center justify-center shadow-lg backdrop-blur-sm"
             >
               <MessageSquare size={20} />
@@ -699,20 +851,20 @@ export default function App() {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-lg">
-              Su Diplomasisi
+              {texts.appTitle}
             </h1>
             
             <div className="flex flex-row gap-4 w-full justify-center">
               <button 
                 onClick={() => setShowHero(false)} 
-                title="Uygulamaya Giriş"
+                title={texts.appTitle}
                 className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full transition-transform shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center"
               >
                 <ChevronRight size={32} />
               </button>
               <button 
                 onClick={() => setShowInfoModal(true)} 
-                title="Hakkında"
+                title={texts.aboutApp}
                 className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 p-4 rounded-full transition-transform shadow-xl hover:-translate-y-1 flex items-center justify-center"
               >
                 <Info size={32} />
@@ -727,7 +879,7 @@ export default function App() {
       <header className="sticky top-0 z-40 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Globe className="text-blue-600 dark:text-blue-400" size={24} />
-          <h1 className="text-lg font-bold text-slate-900 dark:text-white hidden sm:block">Su Diplomasisi</h1>
+          <h1 className="text-lg font-bold text-slate-900 dark:text-white hidden sm:block">{texts.appTitle}</h1>
         </div>
         
         <div className="flex flex-wrap items-center gap-4 border-l border-slate-200 dark:border-slate-700 pl-4 ml-auto">
@@ -740,12 +892,12 @@ export default function App() {
               className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-medium cursor-pointer"
             >
               {['Tümü', ...Array.from(new Set(masterFlashcards.map(c => c.kategori || 'Genel')))].filter(c => c !== "Kurgusal Veri").map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>{cat === 'Tümü' ? texts.all : cat === 'Genel' ? texts.general : cat}</option>
               ))}
             </select>
 
             <select 
-              title="Soru Sayısı"
+              title={texts.cardCount}
               id="card-count" 
               value={cardCount}
               onChange={(e) => setCardCount(e.target.value)}
@@ -754,10 +906,10 @@ export default function App() {
               <option value="10">10 Kart</option>
               <option value="25">25 Kart</option>
               <option value="50">50 Kart</option>
-              <option value="all">Tümü</option>
+              <option value="all">{texts.all}</option>
             </select>
 
-            <button onClick={handleRestart} title="Karıştır & Yenile" className="bg-blue-500 hover:bg-blue-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer flex items-center justify-center">
+            <button onClick={handleRestart} title={texts.shuffleRefresh} className="bg-blue-500 hover:bg-blue-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer flex items-center justify-center">
               <RotateCcw size={16} />
             </button>
           </div>
@@ -766,7 +918,7 @@ export default function App() {
           <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-4">
             <button 
               onClick={openUserPanel}
-              title={currentUser ? 'Profilim' : 'Giriş / Kayıt'}
+              title={currentUser ? texts.myProfile : texts.loginRegister}
               className="bg-emerald-100 border-transparent text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800/80 p-2 rounded-full transition-colors flex items-center justify-center"
             >
               <UserIcon size={18} />
@@ -774,12 +926,18 @@ export default function App() {
             {(!currentUser || currentUser.email?.toLowerCase() === ADMIN_EMAIL) && (
               <button 
                 onClick={openAdminPanel}
-                title="Yönetim Paneli"
+                title={texts.adminPanel}
                 className="bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 p-2 rounded-full transition-colors flex items-center justify-center"
               >
                 <Settings size={18} />
               </button>
             )}
+            <button
+              onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')}
+              className="bg-slate-200 border-transparent text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 p-2 rounded-full transition-colors flex items-center justify-center font-bold text-[10px] w-9 h-9 uppercase"
+            >
+              {lang}
+            </button>
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               title="Tema Değiştir"
@@ -789,14 +947,14 @@ export default function App() {
             </button>
             <button 
               onClick={() => setShowInfoModal(true)}
-              title="Hakkında"
+              title={texts.aboutApp}
               className="bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100 dark:hover:bg-blue-800/80 p-2 rounded-full transition-colors flex items-center justify-center"
             >
               <Info size={18} />
             </button>
             <button 
               onClick={() => setShowFeedbackModal(true)}
-              title="Geri Bildirim Gönder"
+              title={texts.feedbackTitle}
               className="bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-100 dark:hover:bg-amber-800/80 p-2 rounded-full transition-colors flex items-center justify-center"
             >
               <MessageSquare size={18} />
@@ -807,7 +965,7 @@ export default function App() {
 
       {/* Card Arena Setup */}
       <div className="flex items-center justify-center w-full max-w-[900px] gap-2 sm:gap-6 z-10 px-2 sm:px-4 mb-8">
-        <button onClick={prevCard} title="Önceki Soru" className="hidden sm:flex w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full items-center justify-center transition-colors shadow-sm shrink-0">
+        <button onClick={prevCard} title={texts.prevQuestion} className="hidden sm:flex w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full items-center justify-center transition-colors shadow-sm shrink-0">
           <ChevronLeft size={24} />
         </button>
 
@@ -816,7 +974,7 @@ export default function App() {
             
             {/* Front */}
             <div className="card-face absolute w-full h-full bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-10 flex flex-col items-center justify-center text-center border-t-[6px] border-t-blue-500 overflow-y-auto shadow-sm">
-              <div className="absolute top-5 left-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Soru</div>
+              <div className="absolute top-5 left-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{texts.question}</div>
               {currentCard && currentCard.kategori && currentCard.kategori !== "Kurgusal Veri" && (
                   <div className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded-full">{currentCard.kategori}</div>
               )}
@@ -829,9 +987,20 @@ export default function App() {
                     </div>
                   </div>
                   <div className="mt-auto w-full flex flex-col items-center">
-                    <button title="Yanıtı görüntüleyin" className="bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 p-3 rounded-full mb-3 hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
-                      <RefreshCw size={20} />
-                    </button>
+                    <div className="flex gap-4 mb-3">
+                      {currentCard?.ipucu && (
+                        <button 
+                          title={texts.showHint}
+                          onClick={(e) => { e.stopPropagation(); setShowHintModal(true); }}
+                          className="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 p-3 rounded-full hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                        >
+                          <HelpCircle size={20} />
+                        </button>
+                      )}
+                      <button title={texts.viewAnswer} className="bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 p-3 rounded-full hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
+                        <RefreshCw size={20} />
+                      </button>
+                    </div>
                     {currentCard.soru_atif && (
                       <a 
                         href={`https://www.google.com/search?q=${encodeURIComponent(currentCard.soru_atif)}`}
@@ -840,19 +1009,19 @@ export default function App() {
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs italic text-slate-400 dark:text-slate-500 mt-2 pt-4 border-t border-slate-100 dark:border-slate-700 w-full break-words block hover:text-blue-500 dark:hover:text-blue-400 transition-colors z-20"
                       >
-                        Kaynak: {currentCard.soru_atif}
+                        {texts.source} {currentCard.soru_atif}
                       </a>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="text-red-500 font-bold">Veri mevcut değil</div>
+                <div className="text-red-500 font-bold">{texts.noData}</div>
               )}
             </div>
             
             {/* Back */}
             <div className="card-face card-back absolute w-full h-full bg-slate-800 dark:bg-slate-700 rounded-2xl p-6 md:p-10 flex flex-col items-center justify-center text-center border-t-[6px] text-white border-t-slate-400 overflow-y-auto">
-              <div className="absolute top-5 left-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Cevap</div>
+              <div className="absolute top-5 left-5 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">{texts.answer}</div>
               {currentCard && currentCard.kategori && currentCard.kategori !== "Kurgusal Veri" && (
                   <div className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full">{currentCard.kategori}</div>
               )}
@@ -873,20 +1042,20 @@ export default function App() {
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs italic text-slate-300 mt-4 pt-4 border-t border-slate-600 w-full break-words opacity-80 block hover:text-blue-300 transition-colors z-20"
                       >
-                        Kaynak: {currentCard.cevap_atif}
+                        {texts.source} {currentCard.cevap_atif}
                       </a>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="text-red-400 font-bold">Veri mevcut değil</div>
+                <div className="text-red-400 font-bold">{texts.noData}</div>
               )}
             </div>
             
           </div>
         </div>
 
-        <button onClick={nextCard} title="Sonraki Soru" className="hidden sm:flex w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full items-center justify-center transition-colors shadow-sm shrink-0">
+        <button onClick={nextCard} title={texts.nextQuestion} className="hidden sm:flex w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full items-center justify-center transition-colors shadow-sm shrink-0">
           <ChevronRight size={24} />
         </button>
       </div>
@@ -894,11 +1063,11 @@ export default function App() {
       {/* Controls */}
       <div className="flex flex-col items-center w-full max-w-md mb-8 z-10 px-4">
         <div className="flex items-center justify-between w-full mb-3 sm:hidden">
-          <button onClick={prevCard} title="Önceki Soru" className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm shrink-0">
+          <button onClick={prevCard} title={texts.prevQuestion} className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm shrink-0">
             <ChevronLeft size={24} />
           </button>
           
-          <button onClick={nextCard} title="Sonraki Soru" className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm shrink-0">
+          <button onClick={nextCard} title={texts.nextQuestion} className="w-12 h-12 bg-blue-100 border-transparent text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm shrink-0">
             <ChevronRight size={24} />
           </button>
         </div>
@@ -918,21 +1087,21 @@ export default function App() {
       </div>
 
       <div className="flex gap-6 mb-12 z-10 w-full justify-center px-4">
-        <button onClick={() => markCard('Öğrenildi')} title="Öğrenildi Olarak İşaretle" className="w-16 h-16 bg-emerald-100 border-transparent text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm">
+        <button onClick={() => markCard('Öğrenildi')} title={texts.markLearned} className="w-16 h-16 bg-emerald-100 border-transparent text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm">
           <Check size={32} />
         </button>
-        <button onClick={() => markCard('Tekrar Edilecek')} title="Tekrar Edilecek Olarak İşaretle" className="w-16 h-16 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm">
+        <button onClick={() => markCard('Tekrar Edilecek')} title={texts.markToRepeat} className="w-16 h-16 bg-red-100 border-transparent text-red-700 dark:bg-red-900/50 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/80 rounded-full flex items-center justify-center transition-colors shadow-sm">
           <RefreshCw size={32} />
         </button>
       </div>
 
       {/* RSS */}
       <div className="w-full max-w-[700px] bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm mb-12 z-10 mx-4">
-        <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400 border-b-2 border-slate-100 dark:border-slate-700 pb-3 mb-4 mt-0">Güncel Su Diplomasisi Gelişmeleri (RSS)</h3>
+        <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400 border-b-2 border-slate-100 dark:border-slate-700 pb-3 mb-4 mt-0">{texts.rssTitle}</h3>
         {rssLoading ? (
           <div className="text-slate-500 text-sm">Haberler yükleniyor...</div>
         ) : rssError || rssItems.length === 0 ? (
-          <div className="text-red-500 font-bold text-sm">Veri mevcut değil. (Ağ kısıtlaması)</div>
+          <div className="text-red-500 font-bold text-sm">{texts.noData} (Ağ kısıtlaması)</div>
         ) : (
           <div className="flex flex-col">
             {rssItems.map((item, i) => (
